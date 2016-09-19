@@ -72,7 +72,7 @@ exp.prototype.SetDefaultRpcTimeout = function(timeout){
 exp.prototype.parseJson = function(msg){
   var retMsg;
   retMsg = msg;
-  if (typeof msg === 'string' && (msg[0] = '{')) {
+  if (typeof msg == 'string' && msg[0] == '{') {
     try {
       retMsg = JSON.parse(msg);
       if (retMsg && retMsg.type === 'Buffer') {
@@ -85,7 +85,7 @@ exp.prototype.parseJson = function(msg){
 exp.prototype.publishRaw = function(to, msg){
   var _self, str;
   _self = this;
-  if (typeof msg === 'object') {
+  if (typeof msg == 'object') {
     str = JSON.stringify(msg);
     return _self.client.publish(to, str);
   } else {
@@ -95,7 +95,7 @@ exp.prototype.publishRaw = function(to, msg){
 exp.prototype.publishRawWithReply = function(to, msg, reply){
   var _self, str;
   _self = this;
-  if (typeof msg === 'object') {
+  if (typeof msg == 'object') {
     str = JSON.stringify(msg);
     return _self.client.publish(to, str, reply);
   } else {

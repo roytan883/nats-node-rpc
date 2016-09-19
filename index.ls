@@ -67,7 +67,7 @@ exp.prototype.SetDefaultRpcTimeout = (timeout) ->
 
 exp.prototype.parseJson = (msg) ->
   retMsg = msg
-  if typeof msg == 'string' && msg[0] = '{'
+  if typeof msg ~= 'string' && msg[0] ~= '{'
     try
       retMsg = JSON.parse(msg)
       if retMsg && retMsg.type == 'Buffer'
@@ -77,9 +77,9 @@ exp.prototype.parseJson = (msg) ->
 exp.prototype.publishRaw = (to, msg) !->
   _self = this
 #  #console.log("publishRaw = ", &)
-  if typeof msg == 'object'
+  if typeof msg ~= 'object'
     str = JSON.stringify(msg)
-#    #console.log("publishRaw object str = ", str)
+#    console.log("publishRaw object str = ", str)
     return _self.client.publish(to, str)
   else
     return _self.client.publish(to, msg)
@@ -87,7 +87,7 @@ exp.prototype.publishRaw = (to, msg) !->
 exp.prototype.publishRawWithReply = (to, msg, reply) !->
   _self = this
 #  #console.log("publishRawWithReply = ", &)
-  if typeof msg == 'object'
+  if typeof msg ~= 'object'
     str = JSON.stringify(msg)
 #    #console.log("publishRawWithReply 111 to = ", to)
 #    #console.log("publishRawWithReply 111 str = ", str)
