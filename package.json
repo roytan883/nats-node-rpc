@@ -1,6 +1,6 @@
 {
   "name": "nats-node-rpc",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Fast nodejs RPC library based on nats",
   "main": "index.js",
   "scripts": {
