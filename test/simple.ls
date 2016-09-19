@@ -22,4 +22,14 @@ clientB = natsRpc.Create natsServers, "clientB", !->
       console.log("[clientB]-->[after callClientA] >>> err = ", err)
       console.log("[clientB]-->[after callClientA] >>> ret = ", ret)
   , 1000)
+  setTimeout(!->
+    clientB.RpcAsync "invalid", "hi from clientB", (err, ret)!->
+      console.log("[clientB]-->[after invalid] >>> err = ", err)
+      console.log("[clientB]-->[after invalid] >>> ret = ", ret)
+  , 1000)
+  setTimeout(!->
+    clientB.RpcAsyncTimeout "invalid", "hi from clientB", 2000, (err, ret)!->
+      console.log("[clientB]-->[after invalid 2000ms] >>> err = ", err)
+      console.log("[clientB]-->[after invalid 2000ms] >>> ret = ", ret)
+  , 1000)
 

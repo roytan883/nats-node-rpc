@@ -403,10 +403,10 @@ exp.prototype.RpcAsyncTimeout = function(topic, msg, timeout, callback){
   seq = "" + _self.requestsSeq;
   replyString = _self.replySubString + topic + "." + seq;
   timer = setTimeout(function(){
-    callback(new Error("RPC Timeout:" + timeout + "ms"));
     if (_self.requestsCbs[seq]) {
       delete _self.requestsCbs[seq];
     }
+    callback(new Error("RPC Timeout:" + timeout + "ms"));
   }, timeout);
   _self.requestsCbs[seq] = {
     seq: seq,

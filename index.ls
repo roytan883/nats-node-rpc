@@ -339,10 +339,10 @@ exp.prototype.RpcAsyncTimeout = (topic, msg, timeout, callback) !->
   replyString = _self.replySubString + topic + "." + seq
   timer = setTimeout(!->
 #    callback(null, {code:500, err_string:"RPC Timeout:" + timeout + "ms"})
-    callback(new Error("RPC Timeout:" + timeout + "ms"))
-#    callback({code:500, err_string:"RPC Timeout:" + timeout + "ms"})
     if _self.requestsCbs[seq]
       delete _self.requestsCbs[seq]
+    callback(new Error("RPC Timeout:" + timeout + "ms"))
+#    callback({code:500, err_string:"RPC Timeout:" + timeout + "ms"})
   , timeout)
   _self.requestsCbs[seq] = {
     seq:seq

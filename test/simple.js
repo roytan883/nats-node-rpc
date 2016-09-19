@@ -24,4 +24,16 @@ clientB = natsRpc.Create(natsServers, "clientB", function(){
       console.log("[clientB]-->[after callClientA] >>> ret = ", ret);
     });
   }, 1000);
+  setTimeout(function(){
+    clientB.RpcAsync("invalid", "hi from clientB", function(err, ret){
+      console.log("[clientB]-->[after invalid] >>> err = ", err);
+      console.log("[clientB]-->[after invalid] >>> ret = ", ret);
+    });
+  }, 1000);
+  setTimeout(function(){
+    clientB.RpcAsyncTimeout("invalid", "hi from clientB", 2000, function(err, ret){
+      console.log("[clientB]-->[after invalid 2000ms] >>> err = ", err);
+      console.log("[clientB]-->[after invalid 2000ms] >>> ret = ", ret);
+    });
+  }, 1000);
 });
