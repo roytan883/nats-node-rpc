@@ -29,7 +29,8 @@ It is always 1 to 1.
 ### *Full RPC  
 Servers A, B, C ... N, can register to the same **Topic**. 
 When client call **Topic**, all server will receive the request. But only first response(the fastest one) will be used for client.
-> all server still handle the request, just first response(the fastest one) will be handle by client
+> all server still handle the request, just first response(the fastest one) will be handle by client.
+
 > you should only has one **Full RPC handler server**, others should be **Full Push handler servers**
 
 ### *Push and Partial Push
