@@ -7,14 +7,13 @@ two node process: benchmark_s and benchmark_c on local machine
 CPU: intel 4790K
 
 testString 1 sequence start
-testString 1 sequence finished, count = 100000, time = 7994ms, speed = 12509/s
+testString 1 sequence finished, count = 100000, time = 6584ms, speed = 15188/s
 testJson 1 sequence start
-testJson 1 sequence finished, count = 100000, time = 9059ms, speed = 11039/s
+testJson 1 sequence finished, count = 100000, time = 7872ms, speed = 12703/s
 testString 100 sequence start
-testString 100 sequence finished, count = 100000, time = 691ms, speed = 144718/s
+testString 100 sequence finished, count = 100000, time = 583ms, speed = 171527/s
 testJson 100 sequence start
-testJson 100 sequence finished, count = 100000, time = 894ms, speed = 111857/s
-
+testJson 100 sequence finished, count = 100000, time = 680ms, speed = 147059/s
 ```
 
 
