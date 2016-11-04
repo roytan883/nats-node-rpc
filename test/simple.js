@@ -15,6 +15,13 @@ clientA = natsRpc.Create(natsServers, "clientA", function(){
     console.log("[clientA]-->[callClientA] >>> msg = ", msg);
     return cb(null, "hello from callClientA");
   });
+  clientA.RegisterRpcHandlerFull("callClientA-Slow", function(topic, msg, cb){
+    console.log("[clientA]-->[callClientA-Slow] >>> topic = ", topic);
+    console.log("[clientA]-->[callClientA-Slow] >>> msg = ", msg);
+    setTimeout(function(){
+      cb(null, "hello from callClientA-Slow");
+    }, 1000 * 5);
+  });
 });
 clientB = natsRpc.Create(natsServers, "clientB", function(){
   console.log("[clientB]-->[init] >>> connected to nats");
@@ -22,6 +29,12 @@ clientB = natsRpc.Create(natsServers, "clientB", function(){
     clientB.RpcAsync("callClientA", "hi from clientB", function(err, ret){
       console.log("[clientB]-->[after callClientA] >>> err = ", err);
       console.log("[clientB]-->[after callClientA] >>> ret = ", ret);
+    });
+  }, 1000);
+  setTimeout(function(){
+    clientB.RpcAsyncTimeout("callClientA-Slow", "hi from clientB", 2000, function(err, ret){
+      console.log("[clientB]-->[after callClientA-Slow] >>> err = ", err);
+      console.log("[clientB]-->[after callClientA-Slow] >>> ret = ", ret);
     });
   }, 1000);
   setTimeout(function(){

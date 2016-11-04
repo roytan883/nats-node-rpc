@@ -14,6 +14,12 @@ clientA = natsRpc.Create natsServers, "clientA", !->
     console.log("[clientA]-->[callClientA] >>> topic = ", topic)
     console.log("[clientA]-->[callClientA] >>> msg = ", msg)
     return cb(null, "hello from callClientA")
+  clientA.RegisterRpcHandlerFull "callClientA-Slow", (topic, msg, cb) !->
+    console.log("[clientA]-->[callClientA-Slow] >>> topic = ", topic)
+    console.log("[clientA]-->[callClientA-Slow] >>> msg = ", msg)
+    setTimeout(!->
+      cb(null, "hello from callClientA-Slow")
+    , 1000 * 5)
 
 clientB = natsRpc.Create natsServers, "clientB", !->
   console.log("[clientB]-->[init] >>> connected to nats")
@@ -21,6 +27,11 @@ clientB = natsRpc.Create natsServers, "clientB", !->
     clientB.RpcAsync "callClientA", "hi from clientB", (err, ret)!->
       console.log("[clientB]-->[after callClientA] >>> err = ", err)
       console.log("[clientB]-->[after callClientA] >>> ret = ", ret)
+  , 1000)
+  setTimeout(!->
+    clientB.RpcAsyncTimeout "callClientA-Slow", "hi from clientB", 2000, (err, ret)!->
+      console.log("[clientB]-->[after callClientA-Slow] >>> err = ", err)
+      console.log("[clientB]-->[after callClientA-Slow] >>> ret = ", ret)
   , 1000)
   setTimeout(!->
     clientB.RpcAsync "invalid", "hi from clientB", (err, ret)!->

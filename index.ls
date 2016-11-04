@@ -41,12 +41,32 @@ exp = (natsServers, selfName, connectCb) !->
     seq = _topicTokens[_topicTokens.length - 1]
     msg = _self.parseJson(msg)
 #    seq = subject.substring(_self.replySubString.length)
+#    console.log("seq = ", seq)
     if _self.requestsCbs[seq]
       cb = _self.requestsCbs[seq].cb
-      clearTimeout(_self.requestsCbs[seq].timer)
+#      clearTimeout(_self.requestsCbs[seq].timer)
+#      console.log("delete seq = ", seq)
+#      console.log("delete obj = ", _self.requestsCbs[seq])
       delete _self.requestsCbs[seq]
       cb(null, msg)
+    else
+      console.warn("[#{Date.now()}] Got reply but already timeout or replied: topic=#{subject} msg=#{JSON.stringify(msg)}")
   )
+  this.checkTimeoutTimer = setInterval(!->
+    now = Date.now()
+    waitingCount = 0
+    for k,v of _self.requestsCbs
+#      console.log("k = ", k)
+      if v.startTime + v.timeout < now
+        cb = v.cb
+#        console.log("delete k = ", k)
+        delete _self.requestsCbs[k]
+        cb(null, "RPC Timeout: #{v.timeout}ms topic=#{v.topic} replyString=#{v.replyString}")
+      else
+        waitingCount++
+    if waitingCount > 100
+      console.warn("[#{Date.now()}] Waiting too many NATS RPC requests: #{waitingCount}")
+  ,1000)
   _self.inited = false
   if connectCb
     _self.client.once 'connect' !->
@@ -329,24 +349,34 @@ exp.prototype.Push = (topic, msg) ->
 
 exp.prototype.RpcAsync = (topic, msg, callback) !->
   _self = this
+  if (typeof callback) !~= 'function'
+    console.warn("RpcAsync's callback parameter should be function, if you just want call method with no callback, please use [Push] method")
+    callback = !->
   _self.RpcAsyncTimeout(topic, msg, _self.defaultRpcTimeout, callback)
 
 exp.prototype.RpcAsyncTimeout = (topic, msg, timeout, callback) !->
   _self = this
   _self.requestsSeq++
   seq = "" + _self.requestsSeq
+  if (typeof callback) !~= 'function'
+    console.warn("RpcAsyncTimeout's callback parameter should be function, if you just want call method with no callback, please use [Push] method")
+    callback = !->
 #  #console.log("Rpc seq = ", seq)
   replyString = _self.replySubString + topic + "." + seq
-  timer = setTimeout(!->
-#    callback(null, {code:500, err_string:"RPC Timeout:" + timeout + "ms"})
-    if _self.requestsCbs[seq]
-      delete _self.requestsCbs[seq]
-    callback(new Error("RPC Timeout:" + timeout + "ms"))
-#    callback({code:500, err_string:"RPC Timeout:" + timeout + "ms"})
-  , timeout)
+#  timer = setTimeout(!->
+##    callback(null, {code:500, err_string:"RPC Timeout:" + timeout + "ms"})
+#    if _self.requestsCbs[seq]
+#      delete _self.requestsCbs[seq]
+#    callback(new Error("RPC Timeout:" + timeout + "ms"))
+##    callback({code:500, err_string:"RPC Timeout:" + timeout + "ms"})
+#  , timeout)
   _self.requestsCbs[seq] = {
     seq:seq
-    timer:timer
+#    timer:timer
+    topic:topic
+    replyString:replyString
+    startTime:Date.now()
+    timeout:timeout
     cb:callback
   }
   #console.log("RpcAsyncTimeout topic = ", topic)

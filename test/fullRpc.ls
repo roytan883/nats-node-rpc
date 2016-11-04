@@ -16,17 +16,17 @@ clientA = natsRpc.Create natsServers, "clientA", !->
 
 clientB = natsRpc.Create natsServers, "clientB", !->
   console.log("[clientB]-->[init] >>> connected to nats")
-  clientB.RegisterRpcHandlerFull "testFn", (topic, msg, cb) !->
+  clientB.RegisterPushHandlerFull "testFn", (topic, msg) !->
 #    console.log("[clientB]-->[testFn] >>> topic = ", topic)
     console.log("[clientB]-->[testFn] >>> msg = ", msg)
-    return cb(null, "hello from clientB")
+#    return cb(null, "hello from clientB")
 
 clientC = natsRpc.Create natsServers, "clientC", !->
   console.log("[clientC]-->[init] >>> connected to nats")
-  clientC.RegisterRpcHandlerFull "testFn", (topic, msg, cb) !->
+  clientC.RegisterPushHandlerFull "testFn", (topic, msg) !->
 #    console.log("[clientC]-->[testFn] >>> topic = ", topic)
     console.log("[clientC]-->[testFn] >>> msg = ", msg)
-    return cb(null, "hello from clientC")
+#    return cb(null, "hello from clientC")
 
 clientTest = natsRpc.Create natsServers, "clientTest", !->
   console.log("[clientTest]-->[init] >>> connected to nats")

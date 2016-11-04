@@ -17,16 +17,14 @@ clientA = natsRpc.Create(natsServers, "clientA", function(){
 });
 clientB = natsRpc.Create(natsServers, "clientB", function(){
   console.log("[clientB]-->[init] >>> connected to nats");
-  clientB.RegisterRpcHandlerFull("testFn", function(topic, msg, cb){
+  clientB.RegisterPushHandlerFull("testFn", function(topic, msg){
     console.log("[clientB]-->[testFn] >>> msg = ", msg);
-    return cb(null, "hello from clientB");
   });
 });
 clientC = natsRpc.Create(natsServers, "clientC", function(){
   console.log("[clientC]-->[init] >>> connected to nats");
-  clientC.RegisterRpcHandlerFull("testFn", function(topic, msg, cb){
+  clientC.RegisterPushHandlerFull("testFn", function(topic, msg){
     console.log("[clientC]-->[testFn] >>> msg = ", msg);
-    return cb(null, "hello from clientC");
   });
 });
 clientTest = natsRpc.Create(natsServers, "clientTest", function(){

@@ -39,11 +39,30 @@ exp = function(natsServers, selfName, connectCb){
     msg = _self.parseJson(msg);
     if (_self.requestsCbs[seq]) {
       cb = _self.requestsCbs[seq].cb;
-      clearTimeout(_self.requestsCbs[seq].timer);
       delete _self.requestsCbs[seq];
       cb(null, msg);
+    } else {
+      console.warn("[" + Date.now() + "] Got reply but already timeout or replied: topic=" + subject + " msg=" + JSON.stringify(msg));
     }
   });
+  this.checkTimeoutTimer = setInterval(function(){
+    var now, waitingCount, k, ref$, v, cb;
+    now = Date.now();
+    waitingCount = 0;
+    for (k in ref$ = _self.requestsCbs) {
+      v = ref$[k];
+      if (v.startTime + v.timeout < now) {
+        cb = v.cb;
+        delete _self.requestsCbs[k];
+        cb(null, "RPC Timeout: " + v.timeout + "ms topic=" + v.topic + " replyString=" + v.replyString);
+      } else {
+        waitingCount++;
+      }
+    }
+    if (waitingCount > 100) {
+      console.warn("[" + Date.now() + "] Waiting too many NATS RPC requests: " + waitingCount);
+    }
+  }, 1000);
   _self.inited = false;
   if (connectCb) {
     _self.client.once('connect', function(){
@@ -394,23 +413,28 @@ exp.prototype.Push = function(topic, msg){
 exp.prototype.RpcAsync = function(topic, msg, callback){
   var _self;
   _self = this;
+  if (typeof callback != 'function') {
+    console.warn("RpcAsync's callback parameter should be function, if you just want call method with no callback, please use [Push] method");
+    callback = function(){};
+  }
   _self.RpcAsyncTimeout(topic, msg, _self.defaultRpcTimeout, callback);
 };
 exp.prototype.RpcAsyncTimeout = function(topic, msg, timeout, callback){
-  var _self, seq, replyString, timer;
+  var _self, seq, replyString;
   _self = this;
   _self.requestsSeq++;
   seq = "" + _self.requestsSeq;
+  if (typeof callback != 'function') {
+    console.warn("RpcAsyncTimeout's callback parameter should be function, if you just want call method with no callback, please use [Push] method");
+    callback = function(){};
+  }
   replyString = _self.replySubString + topic + "." + seq;
-  timer = setTimeout(function(){
-    if (_self.requestsCbs[seq]) {
-      delete _self.requestsCbs[seq];
-    }
-    callback(new Error("RPC Timeout:" + timeout + "ms"));
-  }, timeout);
   _self.requestsCbs[seq] = {
     seq: seq,
-    timer: timer,
+    topic: topic,
+    replyString: replyString,
+    startTime: Date.now(),
+    timeout: timeout,
     cb: callback
   };
   _self.publishRawWithReply(topic, msg, replyString);
